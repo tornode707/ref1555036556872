@@ -1,1 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Data Analyzer v4.0</title>
+    <style>
+        :root {
+            --glitch-color: #00ff41;
+            --bg-color: #0a0a0a;
+        }
 
+        body {
+            background-color: var(--bg-color);
+            color: var(--glitch-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        #ui-container {
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Глитч эффект для текста */
+        .glitch {
+            font-size: 2rem;
+            font-weight: bold;
+            position: relative;
+            text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75),
+                         -0.025em -0.05em 0 rgba(0, 255, 0, 0.75),
+                         0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            animation: glitch 500ms infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #f00, -0.05em -0.025em 0 #0f0, 0.025em 0.05em 0 #00f; }
+            14% { text-shadow: 0.05em 0 0 #f00, -0.05em -0.025em 0 #0f0, 0.025em 0.05em 0 #00f; }
+            15% { text-shadow: -0.05em -0.025em 0 #f00, 0.025em 0.025em 0 #0f0, -0.05em -0.05em 0 #00f; }
+            49% { text-shadow: -0.05em -0.025em 0 #f00, 0.025em 0.025em 0 #0f0, -0.05em -0.05em 0 #00f; }
+            50% { text-shadow: 0.025em 0.05em 0 #f00, 0.05em 0 0 #0f0, 0 -0.05em 0 #00f; }
+            99% { text-shadow: 0.025em 0.05em 0 #f00, 0.05em 0 0 #0f0, 0 -0.05em 0 #00f; }
+            100% { text-shadow: -0.025em 0 0 #f00, -0.025em -0.025em 0 #0f0, -0.025em -0.05em 0 #00f; }
+        }
+
+        /* Круговой прогресс-бар */
+        .progress-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        svg {
+            transform: rotate(-90deg);
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #222;
+            stroke-width: 10;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: var(--glitch-color);
+            stroke-width: 10;
+            stroke-dasharray: 565.48; /* 2 * PI * R */
+            stroke-dashoffset: 565.48;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        .percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+        }
+
+        /* Логи консоли */
+        #console {
+            height: 100px;
+            width: 80%;
+            font-size: 0.8rem;
+            color: #008f11;
+            overflow: hidden;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid #222;
+            padding: 10px;
+        }
+
+        /* Финальный экран */
+        .hidden { display: none !important; }
+        .scary {
+            color: #ff0000;
+            font-size: 3rem;
+            text-align: center;
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            50% { transform: translate(-1px, -2px) rotate(-1deg); }
+            100% { transform: translate(1px, 2px) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-container">
+        <div class="glitch">SYSTEM ANALYSIS IN PROGRESS</div>
+        
+        <div class="progress-container">
+            <svg width="200" height="200">
+                <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                <circle id="progress-bar" class="circle-progress" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="percentage" id="percent-text">0%</div>
+        </div>
+
+        <div id="console"></div>
+    </div>
+
+    <div id="final-screen" class="hidden">
+        <h1 class="scary">ОШИБКА: ДАННЫЕ УТЕКЛИ!</h1>
+        <p style="font-size: 1.5rem;">Все твои файлы были успешно отправлены на удаленный сервер 192.168.0.1.</p>
+        <h2 class="glitch" style="color: yellow;">ЭТО БЫЛ ФИШИНГ, ТЫ ЛОХ! :P</h2>
+        <p>Пароли, переписки и фото кота теперь у меня.</p>
+        <button onclick="location.reload()" style="background: red; color: white; border: none; padding: 10px 20px; cursor: pointer;">ЗАКРЫТЬ УЯЗВИМОСТЬ</button>
+    </div>
+
+    <script>
+        const logs = [
+            "Подключение к ядру системы...",
+            "Доступ к файловой таблице MFT...",
+            "Извлечение кэша браузера...",
+            "Копирование папки 'Documents'...",
+            "Поиск паролей в .txt файлах...",
+            "Обход двухфакторной аутентификации...",
+            "Загрузка архива на сервер: 45%...",
+            "Сканирование личных фотографий...",
+            "Финализация дампа памяти..."
+        ];
+
+        const consoleBox = document.getElementById('console');
+        const progressBar = document.getElementById('progress-bar');
+        const percentText = document.getElementById('percent-text');
+        const uiContainer = document.getElementById('ui-container');
+        const finalScreen = document.getElementById('final-screen');
+
+        let progress = 0;
+        const totalCircumference = 565.48;
+
+        function updateProgress() {
+            if (progress < 100) {
+                progress += Math.random() * 2;
+                if (progress > 100) progress = 100;
+                
+                const offset = totalCircumference - (progress / 100) * totalCircumference;
+                progressBar.style.strokeDashoffset = offset;
+                percentText.innerText = Math.floor(progress) + "%";
+
+                if (Math.random() > 0.9) {
+                    const logLine = document.createElement('div');
+                    logLine.innerText = "> " + logs[Math.floor(Math.random() * logs.length)];
+                    consoleBox.prepend(logLine);
+                }
+
+                setTimeout(updateProgress, 50 + Math.random() * 100);
+            } else {
+                setTimeout(showFinal, 1000);
+            }
+        }
+
+        function showFinal() {
+            uiContainer.classList.add('hidden');
+            finalScreen.classList.remove('hidden');
+            document.body.style.backgroundColor = "black";
+        }
+
+        // Запуск через 1 секунду после загрузки
+        setTimeout(updateProgress, 1000);
+    </script>
+</body>
+</html>
