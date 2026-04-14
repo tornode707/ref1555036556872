@@ -139,56 +139,86 @@
     </div>
 
     <script>
-        const logs = [
-            "Подключение к ядру системы...",
-            "Доступ к файловой таблице MFT...",
-            "Извлечение кэша браузера...",
-            "Копирование папки 'Documents'...",
-            "Поиск паролей в .txt файлах...",
-            "Обход двухфакторной аутентификации...",
-            "Загрузка архива на сервер: 45%...",
-            "Сканирование личных фотографий...",
-            "Финализация дампа памяти..."
-        ];
+    // Функция для записи Куки (ставим на 365 дней)
+function setCookie(name, value) {
+    const d = new Date();
+    d.setTime(d.getTime() + (365*24*60*60*1000));
+    let expires = "expires="+ d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
 
-        const consoleBox = document.getElementById('console');
-        const progressBar = document.getElementById('progress-bar');
-        const percentText = document.getElementById('percent-text');
-        const uiContainer = document.getElementById('ui-container');
-        const finalScreen = document.getElementById('final-screen');
+// Функция для чтения Куки
+function getCookie(name) {
+    let nameEQ = name + "=";
+    let ca = document.cookie.split(';');
+    for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
 
-        let progress = 0;
-        const totalCircumference = 565.48;
+const logs = [
+    "Подключение к ядру системы...",
+    "Доступ к файловой таблице MFT...",
+    "Извлечение кэша браузера...",
+    "Копирование папки 'Documents'...",
+    "Поиск паролей в .txt файлах...",
+    "Загрузка архива на сервер: 45%...",
+    "Финализация дампа памяти..."
+];
 
-        function updateProgress() {
-            if (progress < 100) {
-                progress += Math.random() * 2;
-                if (progress > 100) progress = 100;
-                
-                const offset = totalCircumference - (progress / 100) * totalCircumference;
-                progressBar.style.strokeDashoffset = offset;
-                percentText.innerText = Math.floor(progress) + "%";
+const consoleBox = document.getElementById('console');
+const progressBar = document.getElementById('progress-bar');
+const percentText = document.getElementById('percent-text');
+const uiContainer = document.getElementById('ui-container');
+const finalScreen = document.getElementById('final-screen');
 
-                if (Math.random() > 0.9) {
-                    const logLine = document.createElement('div');
-                    logLine.innerText = "> " + logs[Math.floor(Math.random() * logs.length)];
-                    consoleBox.prepend(logLine);
-                }
+let progress = 0;
+const totalCircumference = 565.48;
 
-                setTimeout(updateProgress, 50 + Math.random() * 100);
-            } else {
-                setTimeout(showFinal, 1000);
-            }
+function updateProgress() {
+    if (progress < 100) {
+        progress += Math.random() * 2.5; // Чуть ускорил для динамики
+        if (progress > 100) progress = 100;
+        
+        const offset = totalCircumference - (progress / 100) * totalCircumference;
+        progressBar.style.strokeDashoffset = offset;
+        percentText.innerText = Math.floor(progress) + "%";
+
+        if (Math.random() > 0.85) {
+            const logLine = document.createElement('div');
+            logLine.innerText = "> " + logs[Math.floor(Math.random() * logs.length)];
+            consoleBox.prepend(logLine);
         }
 
-        function showFinal() {
-            uiContainer.classList.add('hidden');
-            finalScreen.classList.remove('hidden');
-            document.body.style.backgroundColor = "black";
-        }
+        setTimeout(updateProgress, 70);
+    } else {
+        // Устанавливаем куку перед показом финала
+        setCookie("pwned", "true");
+        setTimeout(showFinal, 800);
+    }
+}
 
-        // Запуск через 1 секунду после загрузки
+function showFinal() {
+    uiContainer.classList.add('hidden');
+    finalScreen.classList.remove('hidden');
+    document.body.style.backgroundColor = "black";
+}
+
+// ПРОВЕРКА ПРИ ЗАГРУЗКЕ
+window.onload = function() {
+    if (getCookie("pwned")) {
+        // Если кука есть, сразу показываем финал и не даем смотреть анимацию
+        showFinal();
+        // Можно даже добавить издевательскую надпись
+        document.querySelector('.scary').innerText = "ТЫ ВСЕ ЕЩЕ ЛОХ!";
+    } else {
+        // Если куки нет — запускаем процесс взлома
         setTimeout(updateProgress, 1000);
+    }
+};
     </script>
 </body>
 </html>
